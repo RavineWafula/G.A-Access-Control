@@ -1,0 +1,13 @@
+Dear {{ owner.owner_name }},
+
+Welcome to Gearbox Academy Access Control!
+
+To confirm your account please click on the following link:
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+Sincerely,
+
+The UON G.A Team
+
+Note: replies to this email address are not monitored.

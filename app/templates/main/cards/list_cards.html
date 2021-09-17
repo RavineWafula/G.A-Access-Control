@@ -1,0 +1,50 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}RFID Cards{% endblock %}
+{% block body %}
+<div class="content-section">
+  <div class="outer">
+    <div class="middle">
+      <div class="inner">
+        <br/>
+        {{ utils.flashed_messages() }}
+        <br/>
+        <h1 style="text-align:center;">RFID Cards</h1>
+        {% if rfidcards  %}
+          <hr class="intro-divider">
+          <div class="center">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th width="25%"> Card UID </th>
+                  <th width="20%"> Active </th>
+                  <th width="20%"> Lost </th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for card in rfidcards %}
+                <tr>
+                  <td> {{ card.card_uid }} </td>
+                  <td> {{ card.active }} </td>
+                  <td> {{ card.lost }} </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div style="text-align: center">
+        {% else %}
+          <div style="text-align: center">
+            <h3> No cards have been added. </h3>
+            <hr class="intro-divider">
+        {% endif %}
+          <a href="{{ url_for('main.add_card') }}" class="btn btn-default btn-lg">
+            <i class="fa fa-plus"></i>
+            Add RFID Card
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

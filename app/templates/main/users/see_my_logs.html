@@ -1,0 +1,43 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %} {{ name }}Logs{% endblock %}
+{% block body %}
+<div class="content-section">
+  <div class="outer">
+    <div class="middle">
+      <div class="inner">
+        <br/>
+        {{ utils.flashed_messages() }}
+        <br/>
+        <h1 style="text-align:center;">My Logs</h1>
+        {% if logs %}
+          <hr class="intro-divider">
+          <div class="center">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th width="10%"> Log ID </th>
+                  <th width="30%"> Name </th>
+                  <th width="20%"> Time </th>
+                  <th width="15%"> Door </th>
+               </tr>
+              </thead>
+              <tbody>
+              {% for log in logs %}
+                    <tr>
+                      <td> {{ log.log_id }} </td>
+                      <td> {{ owner_name }} </td>
+                      <td> {{ log.time }} </td>
+                      <td> {{ log.door }} </td>
+                    </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
