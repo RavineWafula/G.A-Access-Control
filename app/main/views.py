@@ -6,7 +6,7 @@ from . import main
 from .. import db
 
 from .. import mqtt, socketio, log_list
-from ..models import Permission, Log, Role, Owner, Ownership, RFIDCard
+from ..models import Door, Permission, Log, Role, Owner, Ownership, RFIDCard
 
 from datetime import datetime
 import json
@@ -37,7 +37,12 @@ def see_my_logs():
         abort(403)
     
     logs = Log.query.filter_by(ownership_id=current_user.id)
-    return render_template('main/users/see_my_logs.html', logs=logs[::-1], owner_name = current_user.owner_name, title="My Logs")
+    log_entries = []
+    for log in logs:
+        door = Door.query.filter_by(door_id=log.door).first()
+        log_entries.append([log, door.door_name])
+
+    return render_template('main/users/see_my_logs.html', logs=log_entries[::-1], owner_name = current_user.owner_name, title="My Logs")
 
 @main.route('/users/see_all_logs')
 @login_required
@@ -51,7 +56,8 @@ def see_all_logs():
     for log in logs:
         ownership = Ownership.query.filter_by(ownership_id=log.ownership_id).first()
         owner = Owner.query.filter_by(id=ownership.owner_id).first()
-        log_entries.append([log, owner])
+        door = Door.query.filter_by(door_id=log.door).first()
+        log_entries.append([log, owner, door.door_name])
 
     return render_template('main/users/see_all_logs.html', log_entries = log_entries[::-1], title="All Logs")
 
@@ -83,7 +89,7 @@ def assign_user_role(id):
     if form.validate_on_submit():
         role_data = form.role.data
         role_name = list(str(role_data).split())[-1][:-1]
-        # print("------------------", role_name)
+        
         role = Role.query.filter_by(name = role_name).first()
         
         name_data = form.owner.data
@@ -112,12 +118,21 @@ def list_users():
     users = []
     for user in all_users:
         owner = Owner.query.filter_by(id = user.owner_id).first()
+        ownership = Ownership.query.filter_by(owner_id=owner.id).first()
         if user.end_date is not None and user.end_date<datetime.now():
             delete_user(user.ownership_id)
         else: 
             try: role = Role.query.filter_by(id = owner.role_id).first()
             except: role = None
-            users.append([user,owner,role])
+            doors = []
+            for i in range(7):
+                if ownership.doors is not None:
+                    if ownership.doors>>i & 1: 
+                        door = Door.query.filter_by(door_id=i+1).first()
+                        doors.append("allowed")
+                    else: doors.append('-')
+                else: doors.append('-')
+            users.append([user,owner,role, doors])
 
     return render_template('main/users/list_users.html', ownership_list=users, title="Active Users")
 
@@ -240,7 +255,7 @@ def check_rfidtag(card_uid, door_number):
     ownership = Ownership.query.filter_by(card_uid=card_uid).first()
     if ownership is not None:
         owner = Owner.query.filter_by(id = ownership.owner_id).first()
-        print('111111111111', owner.owner_name)
+        
         if ownership.end_date is None:
             if (ownership.doors)>>(door_number-1) & 1:
                 reply = '1#'+str(door_number)
@@ -274,7 +289,7 @@ def check_passcode(phone, passcode, door_number):
     owner = Owner.query.filter_by(phone = phone).first()
 
     if owner is not None:
-        if owner.verify_passcode(passcode):# owner.passcode_hash==hashlib.md5(str(passcode).encode('utf-8')).hexdigest():
+        if owner.verify_passcode(passcode):
             ownership = Ownership.query.filter_by(owner_id=owner.id).first()
             if ownership is not None:
                 if ownership.end_date is None:
@@ -329,6 +344,6 @@ def handle_mqtt_message(client, userdata, message):
 
         if flag==0: mqtt.publish('receive', '0#'+str(arr[-1]))
     
-        print('HAPA',userdata, data)
+        print(userdata, data)
 
     

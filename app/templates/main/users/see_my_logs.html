@@ -25,10 +25,10 @@
               <tbody>
               {% for log in logs %}
                     <tr>
-                      <td> {{ log.log_id }} </td>
+                      <td> {{ log[0].log_id }} </td>
                       <td> {{ owner_name }} </td>
-                      <td> {{ log.time }} </td>
-                      <td> {{ log.door }} </td>
+                      <td> {{ log[0].time }} </td>
+                      <td> {{ log[1] }} </td>
                     </tr>
               {% endfor %}
               </tbody>
