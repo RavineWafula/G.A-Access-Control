@@ -39,7 +39,30 @@ def create_app(config_name):
     if os.getenv('FLASK_CONFIG')=='production':
         app = Flask(__name__)
         app.config.update(SECRET_KEY=os.getenv('SECRET_KEY'),
-                          SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'))
+                          SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
+                          FLASKY_ADMIN=os.getenv('FLASKY_ADMIN'),
+                          MAIL_USERNAME = os.getenv('MAIL_USERNAME'),
+                          MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'),
+
+                          FLASKY_MAIL_SUBJECT_PREFIX = '[G.A Access Control]',
+                          FLASKY_MAIL_SENDER = 'G.A Access Control <machaniravine98@gmail.com>',
+                          TEMPLATES_AUTO_RELOAD = True,
+                          MQTT_BROKER_URL = 'Enivar.mysql.pythonanywhere-services.com',
+                          MQTT_BROKER_PORT = 1883,
+                          MQTT_CLIENT_ID = 'publisher',
+                          MQTT_CLEAN_SESSION = True,
+                          SECTRET = '12345678',
+                          MQTT_USERNAME = '',
+                          MQTT_PASSWORD = '',
+                          MQTT_KEEPALIVE = 5,
+                          MQTT_TLS_ENABLED = False,
+                          MQTT_LAST_WILL_TOPIC = '/dashboard',
+                          MQTT_LAST_WILL_MESSAGE = 'bye',
+                          MQTT_LAST_WILL_QOS = 2,
+                          MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com'),
+                          MAIL_PORT = int(os.environ.get('MAIL_PORT', '587')),
+                          MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1'])
+                    
 
     else:
         app = Flask(__name__, instance_relative_config=True)
