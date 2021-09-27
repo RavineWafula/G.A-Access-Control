@@ -4,7 +4,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectMultipleField, SelectField
 from wtforms.validators import DataRequired, Regexp
 
-from ..models import Owner, Role, RFIDCard
+from ..models import Door, Owner, Role, RFIDCard
 
 class AssignRoleForm(FlaskForm):
     owner = QuerySelectField(query_factory=lambda: Owner.query.filter_by(role_id=None), get_label="owner_name")
@@ -18,7 +18,7 @@ class RFIDCardForm(FlaskForm):
 class OwnershipForm(FlaskForm):
     owner = QuerySelectField(query_factory=lambda: Owner.query.all(), get_label="owner_name")
     rfidcard = QuerySelectField(query_factory=lambda: RFIDCard.query.filter_by(active=False), get_label='card_uid')
-    doors = SelectMultipleField('Select Doors', validators=[DataRequired()], choices=[(1, 'Door1'),(2, 'Door2'),(3, 'Door3'),(4, 'Door4'),(5, 'Door5'),(6, 'Door6'),(7, 'Door7')], coerce=int)
+    doors = SelectMultipleField('Select Doors', coerce=int)
     submit = SubmitField('Submit')
 
 """
@@ -29,4 +29,6 @@ def edit_user(request, id):
     user = User.query.get(id)
     form = UserDetails(request.POST, obj=user)
     form.group_id.choices = [(g.id, g.name) for g in Group.query.order_by('name')]
+
+    #choices=[(1, 'Door1'),(2, 'Door2'),(3, 'Door3'),(4, 'Door4'),(5, 'Door5'),(6, 'Door6'),(7, 'Door7')]
 """

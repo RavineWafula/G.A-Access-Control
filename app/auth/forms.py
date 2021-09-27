@@ -8,8 +8,7 @@ from ..models import Owner
 
 class RegistrationForm(FlaskForm):
     owner_name = StringField('Full Name', validators=[DataRequired(), Length(1, 60)])
-    email = StringField('Email', validators=[DataRequired(), Length(1, 60), Email(), EqualTo('email2', message='Email must match!')])
-    email2 = PasswordField('Confirm Email', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Length(1, 60), Email()])
     phone = StringField('Phone Number eg 254700000000', validators=[DataRequired(), Length(12), Regexp('^[0-9]*$', 0,'Phone number must have only numbers')])
     passcode = PasswordField('Passcode', validators=[DataRequired(), EqualTo('passcode2', message='Passcodes must match!')])
     passcode2 = PasswordField('Confirm Passcode', validators=[DataRequired()])

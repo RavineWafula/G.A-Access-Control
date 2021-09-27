@@ -115,6 +115,12 @@ def list_users():
         abort(403)
     
     all_users = Ownership.query.all()
+    SIZE = 0
+    door_names = []
+    for the_door in Door.query.all():
+        SIZE+=1
+        door_names.append(the_door.door_name)
+
     users = []
     for user in all_users:
         owner = Owner.query.filter_by(id = user.owner_id).first()
@@ -125,16 +131,16 @@ def list_users():
             try: role = Role.query.filter_by(id = owner.role_id).first()
             except: role = None
             doors = []
-            for i in range(7):
+            for i in range(SIZE):
+                door = Door.query.filter_by(door_id=i+1).first()
+                
                 if ownership.doors is not None:
-                    if ownership.doors>>i & 1: 
-                        door = Door.query.filter_by(door_id=i+1).first()
-                        doors.append("allowed")
+                    if ownership.doors>>i & 1: doors.append("allowed")
                     else: doors.append('-')
                 else: doors.append('-')
             users.append([user,owner,role, doors])
 
-    return render_template('main/users/list_users.html', ownership_list=users, title="Active Users")
+    return render_template('main/users/list_users.html', ownership_list=users, door_names=door_names, title="Active Users")
 
 @main.route('/user/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -184,33 +190,6 @@ def add_card():
 
     return render_template('/main/cards/card.html', add_card=add_card, form=form, title='Add RFID Card')
 
-@main.route('/cards/assign_cards')
-@login_required
-def assign_cards():
-    if not current_user.can(Permission.ADMINISTRATOR) or not current_user.can(Permission.EDIT_OWNERS):
-        abort(403)
-
-    assign_cards = True
-
-    form = OwnershipForm()
-    if form.validate_on_submit():
-        owner = Owner.query.filter_by(owner_name = form.owner.data).first()
-        ownership = Ownership(owner_id = owner.id,
-                              start_data = datetime.now(),
-                              end_date = None,
-                              doors = form.doors.data,
-                              card_uid = form.rfidcard.data)
-
-        db.session.add(ownership)
-        db.session.commit()
-        flash("You have successfully added an Ownership")
-
-        return redirect(url_for('main.list_users'))
-
-    else: owner = Owner.query.filter_by(id = 2)
-
-    return render_template('/main/users/owner.html', owner=owner, form=form, assign_cards=assign_cards, title='Add Ownerships')
-
 @main.route('/users/add_owners', methods=['GET', 'POST'])
 @login_required
 def add_owner():
@@ -220,6 +199,7 @@ def add_owner():
     add_owner = True
 
     form = OwnershipForm()
+    form.doors.choices = [(door.door_id, door.door_name) for door in Door.query.all()]
     if form.validate_on_submit():
         owner_data = form.owner.data
         owner_name = str(owner_data)[7:-1]

@@ -29,13 +29,9 @@
                   <th width="20%"> Card UID </th>
                   <th width="20%"> Start Date </th>
                   <th width="20%"> End Data </th>
-                  <th width="10%"> Door 1 </th>
-                  <th width="10%"> Door 2 </th>
-                  <th width="10%"> Door 3 </th>
-                  <th width="10%"> Door 4 </th>
-                  <th width="10%"> Door 5 </th>
-                  <th width="10%"> Door 6 </th>
-                  <th width="10%"> Door 7 </th>
+                  {% for door in door_names %}
+                      <th width="10%"> {{ door }} </th>
+                  {% endfor %}
                 </tr>
               </thead>
               <tbody>
@@ -50,13 +46,9 @@
                         <td> {{ pair[0].card_uid }} </td>
                         <td> {{ pair[0].start_date }} </td>
                         <td> {{ pair[0].end_date }} </td>
-                        <td> {{ pair[3][0] }} </td>
-                        <td> {{ pair[3][1] }} </td>
-                        <td> {{ pair[3][2] }} </td>
-                        <td> {{ pair[3][3] }} </td>
-                        <td> {{ pair[3][4] }} </td>
-                        <td> {{ pair[3][5] }} </td>
-                        <td> {{ pair[3][6] }} </td>
+                        {% for status in pair[3] %}
+                            <td> {{ status }} </td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
               </tbody>
